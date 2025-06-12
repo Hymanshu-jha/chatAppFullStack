@@ -17,18 +17,20 @@ dotenv.config(); // load .env variables
 const PORT = 8080;
  // ✅ Use .env in production
 
+// Replace this with your Vercel frontend URL
+const allowedOrigins = [
+  "https://chat-app-pi-lovat.vercel.app",
+  "http://localhost:5173" // for local dev
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true, // important for cookies
+}));
+
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || origin.startsWith('http://localhost')) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-}));
 
 
 app.use('/api/v1/user', userRouter);
