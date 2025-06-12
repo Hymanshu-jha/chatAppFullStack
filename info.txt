@@ -1,0 +1,69 @@
+# wscat -> WebSocket (CLI) : (best for testing)
+npm install -g wscat
+wscat -c ws://localhost:8080
+
+
+
+
+{
+  "name": "rumi",
+  "password": "rumi",
+  "emailid": "rumi@gmail.com"
+}
+
+
+{
+    "message": "Signin successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODM4OTk2ZjdmNGE2ODkxZDVhNTAyM2MiLCJlbWFpbGlkIjoicnVtaUBnbWFpbC5jb20iLCJpYXQiOjE3NDg2MjY0NTQsImV4cCI6MTc0ODcxMjg1NH0.YrTSN2gSgbzFYykgqncG2GmaBl9HMPWZ9zQg59hJZMo",
+    "user": {
+        "id": "6838996f7f4a6891d5a5023c",
+        "emailid": "rumi@gmail.com"
+    }
+}
+
+.............................................................................
+
+
+
+{
+  "name": "shams",
+  "password": "shams",
+  "emailid": "shams@gmail.com"
+}
+
+
+
+{
+    "message": "Signin successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODM4OTk5ODdmNGE2ODkxZDVhNTAyM2YiLCJlbWFpbGlkIjoic2hhbXNAZ21haWwuY29tIiwiaWF0IjoxNzQ4NjI2NDc5LCJleHAiOjE3NDg3MTI4Nzl9.myaKGQpx3B7G9e8T0V3PAjMAWOnQa1_zmPnLmJYJmKs",
+    "user": {
+        "id": "683899987f4a6891d5a5023f",
+        "emailid": "shams@gmail.com"
+    }
+}
+......................................................
+
+
+{
+  "name": "rahul",
+  "password": "rahul",
+  "emailid": "rahul@gmail.com"
+}
+
+
+{
+    "message": "Signin successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODM4YWRhZjBiZmE3N2QwZDU3YzY1OGQiLCJlbWFpbGlkIjoicmFodWxAZ21haWwuY29tIiwiaWF0IjoxNzQ4NjI2NDI4LCJleHAiOjE3NDg3MTI4Mjh9.VXXGnD4uRjAbrzG_t1NA0mhb76ux194m7BrGTMmgyho",
+    "user": {
+        "id": "6838adaf0bfa77d0d57c658d",
+        "emailid": "rahul@gmail.com"
+    }
+}
+
+{
+
+"type":"direct_message",
+"message":"direct_message aa gya",
+"to": "rahul@gmail.com"
+
+}

@@ -1,0 +1,58 @@
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+
+
+import connectDB from './db/connection/dbConnection.js';
+import errorHandler from './middlewares/errorHandler.middlewares.js';
+import userRouter from './routes/users.routes.js';
+import { socketConnect } from './controllers/websockets.server.js';
+import { app , server } from './controllers/websockets.server.js';
+import chatRouter from './routes/chats.routes.js';
+
+
+
+const PORT = 8080;
+ // ✅ Use .env in production
+
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || origin.startsWith('http://localhost')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
+
+app.use('/api/v1/user', userRouter);
+app.use('/api/v1/chat', chatRouter);
+app.use(errorHandler);
+
+// Connect to DB
+const dbConnect = async () => {
+  try {
+    await connectDB();
+  } catch (error) {
+    console.log('❌ Error while connecting to DB:', error);
+  }
+};
+
+
+dbConnect();
+socketConnect();
+
+
+// Routes
+app.get('/', (req, res) => {
+  res.send('Hello from the home route!');
+});
+
+// Start Server
+server.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+});
