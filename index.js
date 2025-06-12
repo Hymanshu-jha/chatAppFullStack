@@ -10,6 +10,8 @@ import { socketConnect } from './controllers/websockets.server.js';
 import { app , server } from './controllers/websockets.server.js';
 import chatRouter from './routes/chats.routes.js';
 
+import dotenv from 'dotenv';
+dotenv.config(); // load .env variables
 
 
 const PORT = 8080;
