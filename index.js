@@ -19,7 +19,8 @@ const PORT = 8080;
 
 // Replace this with your Vercel frontend URL
 const allowedOrigins = [
-  "https://chat-app-pi-lovat.vercel.app",
+  "https://chat-app-rho-ashy.vercel.app/",
+  
   "http://localhost:5173" // for local dev
 ];
 
