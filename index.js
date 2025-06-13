@@ -19,14 +19,13 @@ const PORT = 8080;
 
 // Replace this with your Vercel frontend URL
 const allowedOrigins = [
-  "https://chat-app-rho-ashy.vercel.app/",
-  
-  "http://localhost:5173" // for local dev
+  "https://chat-app-rho-ashy.vercel.app", // ✅ No trailing slash
+  "http://localhost:5173"
 ];
 
 app.use(cors({
   origin: allowedOrigins,
-  credentials: true, // important for cookies
+  credentials: true,
 }));
 
 
