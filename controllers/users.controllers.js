@@ -37,12 +37,13 @@ export const signup = async (req, res, next) => {
       { expiresIn: '1d' }
     );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',  // ✅ secure only in production
+  sameSite: 'lax',
+  maxAge: 24 * 60 * 60 * 1000,
+});
+
 
     return res.status(201).json({ 
       message: 'Signup successful', 
@@ -93,12 +94,13 @@ export const signin = async (req, res, next) => {
       { expiresIn: '1d' }
     );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',  // ✅ secure only in production
+  sameSite: 'lax',
+  maxAge: 24 * 60 * 60 * 1000,
+});
+
 
     return res.status(200).json({
       message: 'Signin successful',
@@ -118,11 +120,12 @@ export const signin = async (req, res, next) => {
 
 export const logout = (req, res, next) => {
   try {
-    res.clearCookie('token', {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: false,
-    });
+res.clearCookie('token', {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
+});
+
     return res.status(200).json({ message: 'Logged out successfully' });
   } catch (error) {
     res.status(401).json({ loggedIn: false , message: error.message });
