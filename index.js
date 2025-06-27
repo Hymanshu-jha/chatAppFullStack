@@ -9,10 +9,12 @@ import userRouter from './routes/users.routes.js';
 import { socketConnect } from './controllers/websockets.server.js';
 import { app , server } from './controllers/websockets.server.js';
 import chatRouter from './routes/chats.routes.js';
+import { zegoRouter } from './routes/zego.routes.js';
+
 
 import dotenv from 'dotenv';
 dotenv.config(); // load .env variables
-
+console.log('✅ ENV variable:', process.env.MONGO_URI_PRODUCTION);
 
 const PORT = 8080;
  // ✅ Use .env in production
@@ -20,7 +22,9 @@ const PORT = 8080;
 // Replace this with your Vercel frontend URL
 const allowedOrigins = [
   "https://chat-app-rho-ashy.vercel.app", // ✅ No trailing slash
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175"
 ];
 
 app.use(cors({
@@ -35,6 +39,7 @@ app.use(cookieParser());
 
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/chat', chatRouter);
+app.use('/api/v1/zego', zegoRouter);
 app.use(errorHandler);
 
 // Connect to DB

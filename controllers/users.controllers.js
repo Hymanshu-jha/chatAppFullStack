@@ -4,7 +4,11 @@ import User from '../db/models/users.models.js';
 import { jwt_secret_key } from '../variables.js';
 import multer from 'multer';
 
+
+import addVerificationEmailJob from '../utils/bullmq/producer.bullmq.js';
+
 const upload = multer();
+
 
 export const signup = async (req, res, next) => {
   try {
@@ -25,36 +29,20 @@ export const signup = async (req, res, next) => {
       emailid: email,
     });
 
-    // FIX: Make JWT payload consistent - use both _id and userId for compatibility
-    const token = jwt.sign(
-      { 
-        _id: newUser._id, 
-        userId: newUser._id,  // Add userId for WebSocket compatibility
-        emailid: newUser.emailid,
-        name: newUser.name    // Add name to token payload
-      },
+    const verifyToken = jwt.sign(
+      { _id: newUser._id, emailid: newUser.emailid, name: newUser.name },
       jwt_secret_key,
-      { expiresIn: '1d' }
+      { expiresIn: '1h' }
     );
 
-res.cookie('token', token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',  // ✅ secure only in production
-  sameSite: 'none',
-  maxAge: 24 * 60 * 60 * 1000,
-});
+    await addVerificationEmailJob({ to: emailid, token: verifyToken, username: name });
 
+    console.log(`verification email added to the bullmq from signup controller`);
 
     return res.status(201).json({ 
-      message: 'Signup successful', 
-      token,
-      user: {
-        _id: newUser._id,
-        userId: newUser._id,  // Include both for consistency
-        emailid: newUser.emailid,
-        name: newUser.name
-      }
+      message: 'Signup successful. Please check your email to verify your account.' 
     });
+
   } catch (error) {
     console.log('Signup error:', error.message);
     if (error.code === 11000) {
@@ -63,6 +51,10 @@ res.cookie('token', token, {
     next(error);
   }
 };
+
+
+
+
 
 export const signin = async (req, res, next) => {
   try {
@@ -82,6 +74,13 @@ export const signin = async (req, res, next) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    const isVerified = user.isVerified;
+
+    if(!isVerified) {
+      console.log('email not verified yet...');
+      return res.status(401).json({ error: 'emailid is not verified' });
+    }
+
     // FIX: Make JWT payload consistent - use both _id and userId for compatibility
     const token = jwt.sign(
       { 
@@ -97,7 +96,7 @@ export const signin = async (req, res, next) => {
 res.cookie('token', token, {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',  // ✅ secure only in production
-  sameSite: 'none',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   maxAge: 24 * 60 * 60 * 1000,
 });
 
@@ -118,11 +117,15 @@ res.cookie('token', token, {
   }
 };
 
+
+
+
+
 export const logout = (req, res, next) => {
   try {
 res.clearCookie('token', {
   httpOnly: true,
-  ssameSite: 'none',
+  sameSite: 'none',
   secure: process.env.NODE_ENV === 'production',
 });
 
@@ -165,6 +168,11 @@ export const refresh = async (req, res, next) => {
   }
 };
 
+
+
+
+
+
 export const getUserList = async (req, res, next) => {
   try {
     const { name } = req.params;
@@ -204,5 +212,64 @@ export const getUserList = async (req, res, next) => {
     console.error("Error in getUserList:", error.message);
     res.status(500).json({ message: "Internal Server Error." });
     next(error);
+  }
+};
+
+
+
+
+export const verify = async (req, res, next) => {
+  try {
+    // ✅ Get token from query, not from req.params
+    console.log(`verify controller is invoked`);
+    const { token } = req.query;
+    if (!token) {
+      return res.status(400).json({ message: "Token is required." });
+    }
+
+    // ✅ Verify JWT token
+    const decoded = jwt.verify(token, jwt_secret_key);
+
+    // ✅ Find and update user
+    const user = await User.findById(decoded._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    if (user.isVerified) {
+      return res.status(200).json({ message: "Email already verified." });
+    }
+
+    user.isVerified = true;
+    await user.save();
+
+    console.log("Email ID verified successfully!");
+
+        // FIX: Make JWT payload consistent - use both _id and userId for compatibility
+    const token2 = jwt.sign(
+      { 
+        _id: user._id, 
+        userId: user._id,  // Add userId for WebSocket compatibility
+        emailid: user.emailid,
+        name: user.name    // Add name to token payload
+      },
+      jwt_secret_key,
+      { expiresIn: '1d' }
+    );
+
+res.cookie('token', token2, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',  // ✅ secure only in production
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  maxAge: 24 * 60 * 60 * 1000,
+}); 
+
+
+return res.redirect('http://localhost:5173/login'); // already verified
+    
+
+  } catch (error) {
+    console.error("Error in email verification handler:", error.message);
+    return res.status(500).json({ message: "Internal Server Error." });
   }
 };

@@ -51,6 +51,9 @@ export const getMessages = async (req, res, next) => {
     const { _id, emailid } = req.user;
     const { roomId } = req.params;
 
+
+    const userObjectId = new mongoose.Types.ObjectId(_id);
+
     if (!_id || !emailid) {
       return res.status(400).json({
         type: "error",
@@ -103,7 +106,9 @@ export const getMessages = async (req, res, next) => {
       const messageCountStr = await Message.countDocuments({ roomId: roomId });
       console.log(`Total messages with string roomId:`, messageCountStr);
 
-      messages = await Message.find({ roomId: objectRoomId })
+      
+
+      messages = await Message.find({ roomId: objectRoomId , deletedForAll: { $ne: true } , deletedForSome: { $ne: userObjectId }}, {})
         .sort({ createdAt: 1 })
         .populate('sender', 'name emailid _id'); // Add populate for group messages too
 
@@ -111,7 +116,7 @@ export const getMessages = async (req, res, next) => {
 
     } else {
       console.log('Fetching direct messages...');
-      messages = await Message.find({ roomId: objectRoomId })
+       messages = await Message.find({ roomId: objectRoomId , deletedForAll: { $ne: true } , deletedForSome: { $ne: userObjectId }}, {})
         .sort({ createdAt: 1 })
         .populate('sender', 'name emailid _id')
         .populate('receiver', 'name emailid _id')
@@ -137,3 +142,28 @@ export const getMessages = async (req, res, next) => {
     next(error);
   }
 };
+
+
+
+
+export const deleteMessage = async (req, res, next) => {
+  try {
+    
+    const messageId = req?.params?.id;
+
+    const {deleteType} = req.query;
+
+    if(!messageId) {
+      return res.json({message: "no id received" , type: 'error'});
+    }
+
+    // fetch message from db
+    // if delete type === 'me' then add user's ref to the deletedFor array
+    // if delete type === 'everyone' then add refs to all the members into the deletedFor array
+
+
+  } catch (error) {
+        console.error("Error in getMessages:", error);
+        next(error);
+  }
+}

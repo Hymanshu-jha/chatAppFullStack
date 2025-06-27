@@ -43,6 +43,16 @@ const messageSchema = new Schema({
     enum: ['text', 'image', 'file'],
     default: 'text',
   },
+
+  deletedForSome: [{
+    type: Types.ObjectId,
+    ref: 'User'
+  }],
+
+  deletedForAll: {
+    type: Boolean,
+    default: false
+  }
 }, {
   timestamps: true,  // adds createdAt and updatedAt automatically
 });

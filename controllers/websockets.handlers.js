@@ -12,6 +12,81 @@ export const handleMessage = async (ws, msg) => {
 
 
 
+case 'delete_message': {
+  const { messageId, deleteType } = msg;
+
+  if (
+    !messageId ||
+    !deleteType ||
+    (deleteType !== 'me' && deleteType !== 'everyone')
+  ) {
+    ws.send(
+      JSON.stringify({
+        type: 'error',
+        message: 'Either messageId or deleteType is missing or invalid',
+      })
+    );
+    break;
+  }
+
+  try {
+    let updated = null; // 👈 declare outside
+    const userObjectId = new mongoose.Types.ObjectId(ws.user._id);
+
+
+    if (deleteType === 'me') {
+      updated = await Message.findByIdAndUpdate(
+        messageId,
+        { $addToSet: { deletedForSome: userObjectId } },
+        { new: true }
+      ).populate('roomId', 'members');
+
+      
+    } else if (deleteType === 'everyone') {
+      updated = await Message.findByIdAndUpdate(
+        messageId,
+        {
+          $addToSet: { deletedForSome: ws?.user?._id },
+          $set: { deletedForAll: true },
+        },
+        { new: true }
+      ).populate('roomId', 'members');
+
+  
+    }
+
+    if(updated)console.log('Deleted for me successfully');
+    // ✅ Send update to all members in the room
+    if (updated?.roomId?.members) {
+      for (const memberId of updated.roomId.members) {
+        const memberIdStr = memberId.toString();
+        const memberSocket = onlineUsers.get(memberIdStr);
+
+        if (memberSocket && memberSocket.readyState === WebSocket.OPEN) {
+          memberSocket.send(
+            JSON.stringify({
+              type: 'delete_message',
+              messageId: messageId,
+              timestamp: new Date().toISOString(),
+            })
+          );
+        }
+      }
+    }
+  } catch (error) {
+    ws.send(
+      JSON.stringify({
+        type: 'error',
+        message: error.message,
+      })
+    );
+  }
+
+  break;
+}
+
+
+
 
 case 'group_create': {
   try {
