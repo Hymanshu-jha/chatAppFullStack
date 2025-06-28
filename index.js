@@ -14,7 +14,7 @@ import { zegoRouter } from './routes/zego.routes.js';
 
 import dotenv from 'dotenv';
 dotenv.config(); // load .env variables
-console.log('✅ ENV variable:', process.env.MONGO_URI_PRODUCTION);
+console.log('✅ ENV variable:', process.env.MONGO_URL_PRODUCTION);
 
 const PORT = 8080;
  // ✅ Use .env in production
