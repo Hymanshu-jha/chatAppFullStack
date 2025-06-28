@@ -5,15 +5,14 @@ import IORedis from 'ioredis';
 // -----------------------------
 // BULLMQ CONNECTION FIXED HERE
 // -----------------------------
-const connection = new IORedis({
-  host: 'redis-16766.c90.us-east-1-3.ec2.redns.redis-cloud.com',
-  port: 16766,
-  username: 'default',
-  password: '94KbuOGipWXT3vYOsmVFEaNOBEEjXzv3',
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+const connection = new IORedis(
+  'rediss://default:94KbuOGipWXT3vYOsmVFEaNOBEEjXzv3@redis-16766.c90.us-east-1-3.ec2.redns.redis-cloud.com:16766',
+  {
+    tls: {
+      rejectUnauthorized: false
+    }
+  }
+);
 
 
 
