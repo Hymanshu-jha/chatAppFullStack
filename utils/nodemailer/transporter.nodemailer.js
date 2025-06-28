@@ -12,7 +12,7 @@ const sendVerificationMail = async ({ to , token , username }) => {
 
   const html = generateVerificationEmail({
     username,
-    verificationLink: `http://localhost:8080/api/v1/user/verify?token=${token}`,
+    verificationLink: `https://chatappfullstack-1.onrender.com/user/verify?token=${token}`,
   });
 
   const info = await transport.sendMail({
