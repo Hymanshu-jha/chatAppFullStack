@@ -217,59 +217,81 @@ export const getUserList = async (req, res, next) => {
 
 
 
-
 export const verify = async (req, res, next) => {
   try {
-    // ✅ Get token from query, not from req.params
-    console.log(`verify controller is invoked`);
+    console.log('🔍 Verify route hit');
+    console.log('📝 Full request URL:', req.url);
+    console.log('📝 Query params:', req.query);
+    console.log('📝 Request method:', req.method);
+    
     const { token } = req.query;
+    console.log('🎫 Token received:', token ? 'Yes' : 'No');
+    
     if (!token) {
+      console.log('❌ No token provided');
       return res.status(400).json({ message: "Token is required." });
     }
 
-    // ✅ Verify JWT token
+    console.log('🔐 Attempting to verify JWT token...');
     const decoded = jwt.verify(token, jwt_secret_key);
+    console.log('✅ JWT decoded successfully:', decoded);
 
-    // ✅ Find and update user
+    console.log('👤 Looking for user with ID:', decoded._id);
     const user = await User.findById(decoded._id);
+    
     if (!user) {
+      console.log('❌ User not found in database');
       return res.status(404).json({ message: "User not found." });
     }
 
+    console.log('👤 User found:', user.emailid);
+    console.log('✅ User verification status:', user.isVerified);
+
     if (user.isVerified) {
+      console.log('ℹ️ User already verified');
       return res.status(200).json({ message: "Email already verified." });
     }
 
+    console.log('🔄 Updating user verification status...');
     user.isVerified = true;
     await user.save();
+    console.log('✅ User verification updated successfully');
 
-    console.log("Email ID verified successfully!");
-
-        // FIX: Make JWT payload consistent - use both _id and userId for compatibility
+    // Create new token
     const token2 = jwt.sign(
       { 
         _id: user._id, 
-        userId: user._id,  // Add userId for WebSocket compatibility
+        userId: user._id,
         emailid: user.emailid,
-        name: user.name    // Add name to token payload
+        name: user.name
       },
       jwt_secret_key,
       { expiresIn: '1d' }
     );
 
-res.cookie('token', token2, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',  // ✅ secure only in production
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-  maxAge: 24 * 60 * 60 * 1000,
-}); 
+    res.cookie('token', token2, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+    }); 
 
-
-return res.redirect('https://chat-app-rho-ashy.vercel.app'); // already verified
-    
+    console.log('🎉 Verification completed successfully');
+    return res.json({ message: `User verified successfully` });
 
   } catch (error) {
-    console.error("Error in email verification handler:", error.message);
+    console.error("❌ Error in email verification handler:", error);
+    
+    if (error.name === 'JsonWebTokenError') {
+      console.log('🚫 Invalid JWT token');
+      return res.status(400).json({ message: "Invalid token." });
+    }
+    
+    if (error.name === 'TokenExpiredError') {
+      console.log('⏰ JWT token expired');
+      return res.status(400).json({ message: "Token expired." });
+    }
+    
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };

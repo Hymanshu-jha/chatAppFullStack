@@ -1,18 +1,28 @@
 import nodemailer from "nodemailer";
 import generateVerificationEmail from "./VerificationMailTemplate.js";
 
-const sendVerificationMail = async ({ to , token , username }) => {
+
+import dotenv from 'dotenv';
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: ".env.production" });
+} else {
+  dotenv.config({ path: ".env.local" });
+}
+
+const sendVerificationMail = async ({ to, token, username }) => {
   const transport = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.FROM_EMAIL,
-      pass: process.env.GMAIL_APP_PASSWORD, // use env for password too
+      pass: process.env.GMAIL_APP_PASSWORD,
     },
   });
 
+  const verificationLink = `${process.env.BASE_URL}/api/v1/user/verify?token=${token}`;
+
   const html = generateVerificationEmail({
     username,
-    verificationLink: `https://chatappfullstack-1.onrender.com/user/verify?token=${token}`,
+    verificationLink,
   });
 
   const info = await transport.sendMail({

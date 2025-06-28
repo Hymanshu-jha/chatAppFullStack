@@ -1,12 +1,15 @@
 import { Worker } from 'bullmq';
-import IORedis from 'ioredis';
+import Redis from 'ioredis';
 import sendVerificationMail from './utils/nodemailer/transporter.nodemailer.js';
 
 import dotenv from 'dotenv';
 dotenv.config();
 
 
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const REDIS_TOKEN = process.env.REDIS_TOKEN;
+const connection = new Redis(`rediss://default:${REDIS_TOKEN}@tender-chipmunk-14111.upstash.io:6379`, {
+  maxRetriesPerRequest: null
+});
 
 const worker = new Worker(
   'verifyEmail',
