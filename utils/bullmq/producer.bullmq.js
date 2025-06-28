@@ -10,8 +10,11 @@ const connection = new IORedis({
   port: 16766,
   username: 'default',
   password: '94KbuOGipWXT3vYOsmVFEaNOBEEjXzv3',
-  tls: {}, // required for Redis Cloud
+  tls: {
+    rejectUnauthorized: false,
+  },
 });
+
 
 
 
