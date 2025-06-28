@@ -217,7 +217,7 @@ export const getUserList = async (req, res, next) => {
 
 
 
-export const verify = async (req, res, next) => {
+export const verify = async (req, res) => {
   try {
     console.log('🔍 Verify route hit');
     console.log('📝 Full request URL:', req.url);
