@@ -3,11 +3,7 @@ import generateVerificationEmail from "./VerificationMailTemplate.js";
 
 
 import dotenv from 'dotenv';
-if (process.env.NODE_ENV === "production") {
-  dotenv.config({ path: ".env.production" });
-} else {
-  dotenv.config({ path: ".env.local" });
-}
+dotenv.config();
 
 const sendVerificationMail = async ({ to, token, username }) => {
   const transport = nodemailer.createTransport({
