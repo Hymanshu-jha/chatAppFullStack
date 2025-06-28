@@ -265,7 +265,7 @@ res.cookie('token', token2, {
 }); 
 
 
-return res.redirect('https://chat-app-rho-ashy.vercel.app/signin'); // already verified
+return res.redirect('https://chat-app-rho-ashy.vercel.app'); // already verified
     
 
   } catch (error) {
