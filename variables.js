@@ -1,1 +1,0 @@
-export const jwt_secret_key = `your_secret_key`;

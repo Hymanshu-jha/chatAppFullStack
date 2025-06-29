@@ -1,8 +1,12 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import User from '../db/models/users.models.js';
-import { jwt_secret_key } from '../variables.js';
 import multer from 'multer';
+
+import dotenv from 'dotenv';
+dotenv.config(); // load .env variables
+
+const jwt_secret_key = process.env.JWT_SECRET_KEY;
 
 
 import addVerificationEmailJob from '../utils/bullmq/producer.bullmq.js';

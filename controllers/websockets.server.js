@@ -5,8 +5,12 @@ import jwt from 'jsonwebtoken';
 import url from 'url';
 import cookie from 'cookie'; // ✅ import this
 import cookieParser from 'cookie-parser';
-import { jwt_secret_key } from '../variables.js';
 import { handleMessage } from './websockets.handlers.js';
+
+import dotenv from 'dotenv';
+dotenv.config(); // load .env variables
+
+const jwt_secret_key = process.env.JWT_SECRET_KEY;
 
 export const app = express();
 export const server = http.createServer(app);

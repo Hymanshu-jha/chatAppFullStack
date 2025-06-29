@@ -14,6 +14,14 @@ const sendVerificationMail = async ({ to, token, username }) => {
     },
   });
 
+  transport.verify((error, success) => {
+  if (error) {
+    console.error("SMTP connection failed:", error);
+  } else {
+    console.log("SMTP server is ready to take messages");
+  }
+});
+
   const verificationLink = `${process.env.BASE_URL}/api/v1/user/verify?token=${token}`;
 
   const html = generateVerificationEmail({
