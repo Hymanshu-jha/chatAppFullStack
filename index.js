@@ -32,6 +32,11 @@ app.use(cors({
   credentials: true,
 }));
 
+app.options('*', cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 
 app.use(express.json());
 app.use(cookieParser());
